@@ -7,6 +7,32 @@ export default function Home() {
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [name, setName] = useState<string>("");
+
+  const signUpUser = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password, name }),
+      });
+
+      if (response.status === 409) {
+        alert("User already exists");
+      } else if (response.status === 201) {
+        const data = await response.json();
+        router.push("/signIn");
+      } else {
+        console.error("Signup failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const handleSignIn = () => {
     router.push("/signIn");
@@ -19,7 +45,16 @@ export default function Home() {
         <div className="py-6 px-4 border-2 border-gray-300 rounded-xl my-2">
           <h1 className="text-2xl mb-2 font-semibold">Sign Up</h1>
 
-          <form className="flex flex-col">
+          <form className="flex flex-col" onSubmit={signUpUser}>
+            <label className="text-sm font-semibold py-1">Name</label>
+            <input
+              type="text"
+              name="name"
+              className="rounded-sm border-2"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
             <label className="text-sm font-semibold py-1">Email</label>
             <input
               type="email"
