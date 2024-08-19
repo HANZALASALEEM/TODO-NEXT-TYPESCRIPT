@@ -1,11 +1,13 @@
 import { NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";
+import GithubProvider from "next-auth/providers/github";
 import { prisma } from "@/lib/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-
+const GITHUB_ID = process.env.GITHUB_ID;
+const GITHUB_SECRET = process.env.GITHUB_SECRET;
 export const authOption: NextAuthOptions = {
   pages: {
     signIn: "/signIn",
@@ -14,6 +16,49 @@ export const authOption: NextAuthOptions = {
     strategy: "jwt",
   },
   providers: [
+    GithubProvider({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+      async profile(profile) {
+        if (!profile?.email) {
+          throw new Error("No Profile");
+        }
+
+        try {
+          const user = await prisma.users.upsert({
+            where: { email: profile.email },
+            create: {
+              email: profile.email,
+              name: profile.name,
+            },
+            update: {
+              name: profile.name,
+            },
+          });
+
+          const findUser = await prisma.users.findUnique({
+            where: { email: profile.email },
+          });
+
+          if (findUser) {
+            profile.sub = findUser.id;
+          } else {
+            throw new Error("User not found after upsert");
+          }
+        } catch (error) {
+          console.error("Error upserting user:", error.message);
+          console.error("Stack trace:", error.stack);
+          throw new Error("Database operation failed");
+        }
+
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+        };
+      },
+    }),
     GoogleProvider({
       clientId: GOOGLE_CLIENT_ID!,
       clientSecret: GOOGLE_CLIENT_SECRET!,

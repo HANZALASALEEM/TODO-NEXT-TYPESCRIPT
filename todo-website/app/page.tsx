@@ -45,6 +45,13 @@ export default function Home() {
     });
   };
 
+  const githubSignIn = async () => {
+    await signIn("github", {
+      callbackUrl: "/home",
+      redirect: false,
+    });
+  };
+
   return (
     <div className="w-screen h-screen flex items-center justify-center">
       <div className="w-3/4 h-3/4 lg:w-1/3">
@@ -119,6 +126,22 @@ export default function Home() {
               className="mx-3"
             />
             Sign Up with Google
+          </button>
+        </div>
+        {/* Sign In with Git Hub Button */}
+        <div className="w-full">
+          <button
+            className="bg-white flex items-center justify-center border-gray-400 border-2 rounded-xl my-2 text-sm py-1 rounded-sm w-full"
+            onClick={githubSignIn}
+          >
+            <Image
+              src="/images/github.png"
+              alt="google"
+              width={20}
+              height={20}
+              className="mx-3"
+            />
+            Sign Up with GitHub
           </button>
         </div>
       </div>
