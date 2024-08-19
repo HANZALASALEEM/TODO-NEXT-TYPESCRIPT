@@ -6,8 +6,7 @@ import { prisma } from "@/lib/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GITHUB_ID = process.env.GITHUB_ID;
-const GITHUB_SECRET = process.env.GITHUB_SECRET;
+
 export const authOption: NextAuthOptions = {
   pages: {
     signIn: "/signIn",
@@ -103,31 +102,31 @@ export const authOption: NextAuthOptions = {
       },
     }),
 
-    // CredentialsProvider({
-    //   name: "Credentials",
-    //   credentials: {
-    //     email: { label: "Email", type: "text", placeholder: "jsmith" },
-    //     password: { label: "Password", type: "password" },
-    //   },
-    //   async authorize(credentials, req) {
-    //     if (!credentials?.email || !credentials?.password) {
-    //       return null;
-    //     }
-    //     const existingUser = await prisma.users.findUnique({
-    //       where: { email: credentials?.email, password: credentials?.password },
-    //     });
-    //     if (!existingUser) {
-    //       return null;
-    //     }
-    //     if (existingUser) {
-    //       return {
-    //         id: `${existingUser.id}`,
-    //         email: existingUser.email,
-    //       };
-    //     }
-    //     return null;
-    //   },
-    // }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text", placeholder: "jsmith" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials, req) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+        const existingUser = await prisma.users.findUnique({
+          where: { email: credentials?.email, password: credentials?.password },
+        });
+        if (!existingUser) {
+          return null;
+        }
+        if (existingUser) {
+          return {
+            id: `${existingUser.id}`,
+            email: existingUser.email,
+          };
+        }
+        return null;
+      },
+    }),
   ],
   callbacks: {
     async session({ session, user, token }) {
