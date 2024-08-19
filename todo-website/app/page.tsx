@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-
+import { signIn } from "next-auth/react";
 export default function Home() {
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
@@ -36,6 +36,13 @@ export default function Home() {
 
   const handleSignIn = () => {
     router.push("/signIn");
+  };
+
+  const googleSignIn = async () => {
+    await signIn("google", {
+      callbackUrl: "/home",
+      redirect: false,
+    });
   };
 
   return (
@@ -102,7 +109,7 @@ export default function Home() {
         <div className="w-full">
           <button
             className="bg-white flex items-center justify-center border-gray-400 border-2 rounded-xl my-2 text-sm py-1 rounded-sm w-full"
-            // onClick={googleSignIn}
+            onClick={googleSignIn}
           >
             <Image
               src="/images/gogle.png"
