@@ -11,7 +11,7 @@ export async function POST(req: Request, res: Response) {
     );
   }
   try {
-    const findUser = await prisma.users.findUnique({
+    const findUser = await prisma.user.findUnique({
       where: {
         email: email,
       },
@@ -21,7 +21,7 @@ export async function POST(req: Request, res: Response) {
       return NextResponse.json({ msg: "User Already Exists" }, { status: 409 });
     }
 
-    const newUser = await prisma.users.create({
+    const newUser = await prisma.user.create({
       data: {
         name,
         email,

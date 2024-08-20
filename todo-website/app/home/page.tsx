@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 const HomePage = () => {
   const { data: session } = useSession();
-  const [showModal, setShowModal] = useState<Boolean>(true);
+  const [showModal, setShowModal] = useState<Boolean>(false);
   const [title, setTitle] = useState<String>("");
   const [description, setDescription] = useState<String>("");
   const [taskType, setTaskType] = useState<String>("");
@@ -22,10 +22,7 @@ const HomePage = () => {
   const dateFormatList = ["DD/MM/YYYY", "DD/MM/YY", "DD-MM-YYYY", "DD-MM-YY"];
   const handleDatePicker = (value: any) => {
     const formattedDate = value.format("DD MMMM YYYY");
-    // setDate(value.$d);
     setDate(formattedDate);
-
-    console.log(typeof date);
   };
 
   return (
@@ -43,14 +40,14 @@ const HomePage = () => {
                 type="text"
                 className="rounded-sm border-2"
                 required
-                //onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => setTitle(e.target.value)}
               />
               <label className="text-sm font-semibold py-1">Description</label>
               <input
                 type="text"
                 className="rounded-sm border-2"
                 required
-                //onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => setDescription(e.target.value)}
               />
               <label className="text-sm font-semibold py-1">Task Type</label>
               <Space wrap>

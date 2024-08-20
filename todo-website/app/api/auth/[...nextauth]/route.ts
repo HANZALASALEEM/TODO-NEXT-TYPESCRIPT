@@ -24,7 +24,7 @@ export const authOption: NextAuthOptions = {
         }
 
         try {
-          const user = await prisma.users.upsert({
+          const user = await prisma.user.upsert({
             where: { email: profile.email },
             create: {
               email: profile.email,
@@ -35,7 +35,7 @@ export const authOption: NextAuthOptions = {
             },
           });
 
-          const findUser = await prisma.users.findUnique({
+          const findUser = await prisma.user.findUnique({
             where: { email: profile.email },
           });
 
@@ -67,7 +67,7 @@ export const authOption: NextAuthOptions = {
         }
 
         try {
-          const user = await prisma.users.upsert({
+          const user = await prisma.user.upsert({
             where: { email: profile.email },
             create: {
               email: profile.email,
@@ -78,7 +78,7 @@ export const authOption: NextAuthOptions = {
             },
           });
 
-          const findUser = await prisma.users.findUnique({
+          const findUser = await prisma.user.findUnique({
             where: { email: profile.email },
           });
 
@@ -112,7 +112,7 @@ export const authOption: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        const existingUser = await prisma.users.findUnique({
+        const existingUser = await prisma.user.findUnique({
           where: { email: credentials?.email, password: credentials?.password },
         });
         if (!existingUser) {
@@ -122,6 +122,7 @@ export const authOption: NextAuthOptions = {
           return {
             id: `${existingUser.id}`,
             email: existingUser.email,
+            name: existingUser.name,
           };
         }
         return null;
