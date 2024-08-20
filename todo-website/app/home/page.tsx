@@ -1,7 +1,120 @@
-import React from "react";
-
+"use client";
+import React, { useState } from "react";
+import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
+import Modal from "@/component/Modal/Modal";
+import { Select, Space, DatePicker } from "antd";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 const HomePage = () => {
-  return <div>HomePage</div>;
+  const { data: session } = useSession();
+  const [showModal, setShowModal] = useState<Boolean>(true);
+  const [title, setTitle] = useState<String>("");
+  const [description, setDescription] = useState<String>("");
+  const [taskType, setTaskType] = useState<String>("");
+  const [date, setDate] = useState<any>("");
+
+  const handleTypePicker = (value: String) => {
+    setTaskType(value);
+  };
+
+  dayjs.extend(customParseFormat);
+  const dateFormatList = ["DD/MM/YYYY", "DD/MM/YY", "DD-MM-YYYY", "DD-MM-YY"];
+  const handleDatePicker = (value: any) => {
+    const formattedDate = value.format("DD MMMM YYYY");
+    // setDate(value.$d);
+    setDate(formattedDate);
+
+    console.log(typeof date);
+  };
+
+  return (
+    <div className="w-screen h-screen bg-red-100 flex flex-col md:flex-row">
+      {/* Modal Component */}
+      {showModal && (
+        <Modal onClose={() => setShowModal(false)} isOpen={showModal}>
+          {/* container */}
+          <div className="py-10 px-8 border-2 border-gray-300 rounded-xl">
+            <h1 className="text-2xl mb-2 font-semibold">Add a new Task</h1>
+
+            <form className="flex flex-col">
+              <label className="text-sm font-semibold py-1">Title</label>
+              <input
+                type="text"
+                className="rounded-sm border-2"
+                required
+                //onChange={(e) => setTitle(e.target.value)}
+              />
+              <label className="text-sm font-semibold py-1">Description</label>
+              <input
+                type="text"
+                className="rounded-sm border-2"
+                required
+                //onChange={(e) => setDescription(e.target.value)}
+              />
+              <label className="text-sm font-semibold py-1">Task Type</label>
+              <Space wrap>
+                <Select
+                  defaultValue="Work"
+                  style={{
+                    width: 120,
+                  }}
+                  onChange={handleTypePicker}
+                  options={[
+                    {
+                      value: "Personal",
+                      label: "Personal",
+                    },
+                    {
+                      value: "Work",
+                      label: "Work",
+                    },
+                  ]}
+                />
+              </Space>
+              <label className="text-sm font-semibold py-1">Date</label>
+              <Space direction="vertical" size={12}>
+                <DatePicker
+                  defaultValue={dayjs("01/01/2024", dateFormatList[0])}
+                  format={dateFormatList}
+                  onChange={handleDatePicker}
+                  required
+                />
+              </Space>
+
+              <button
+                className="bg-yellow-500 my-2 text-sm py-1 rounded-sm"
+                type="submit"
+              >
+                Continue
+              </button>
+            </form>
+          </div>
+        </Modal>
+      )}
+      {/* Home Screen */}
+      <div className=" w-full min-h-screen md:w-[60%] md:h-full bg-red-200">
+        <h1 className="text-2xl font-semibold px-3 py-3">
+          {session?.user?.name}
+        </h1>
+        {/* Add A Task Button */}
+        <button
+          className="w-full h-8 bg-white border-t-[1px] border-b-[1px] border-gray-300 px-8 flex flex-row items-center"
+          onClick={() => setShowModal(true)}
+        >
+          <Image
+            src="/images/plus.png"
+            alt="add icon "
+            width={22}
+            height={22}
+          />
+          <p className="text-gray-400 px-1">Add a new Task</p>
+        </button>
+      </div>
+      {/* Detail Component */}
+      <div className="w-full min-h-screen md:w-[40%] md:h-full bg-red-300"></div>
+    </div>
+  );
 };
 
 export default HomePage;
