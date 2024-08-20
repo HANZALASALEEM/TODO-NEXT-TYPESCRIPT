@@ -1,18 +1,67 @@
 "use client";
-import React, { useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import Modal from "@/component/Modal/Modal";
+import Modal from "@/components/Modal/Modal";
 import { Select, Space, DatePicker } from "antd";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import useSWR, { mutate } from "swr";
+import Link from "next/link";
+import DetailComponent from "@/components/DetailComponent";
+import { useSearchParams } from "next/navigation";
+
+const fetcher = (url: string) =>
+  fetch(url).then((res) => {
+    if (!res.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return res.json();
+  });
+
 const HomePage = () => {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const itemTitle = searchParams.get("title");
   const [showModal, setShowModal] = useState<Boolean>(false);
   const [title, setTitle] = useState<String>("");
   const [description, setDescription] = useState<String>("");
   const [taskType, setTaskType] = useState<String>("");
   const [date, setDate] = useState<any>("");
+  const [user_id, setUserId] = useState(session?.user?.id);
+  const { data, error, isLoading } = useSWR(
+    user_id ? `/api/getTasks?id=${user_id}` : null, // Fetch only if user_id is available
+    fetcher
+  );
+
+  //   // Error handling
+  //   if (error) return <div>Error loading tasks</div>;
+
+  //   // Loading state
+  //   if (isLoading) return <div>Loading...</div>;
+
+  useEffect(() => {
+    setUserId(session?.user?.id);
+    console.log(data);
+    console.log(user_id);
+    // const getTasks = async () => {
+    //   try {
+    //     const response = await fetch(`/api/getTasks?id=${user_id}`, {
+    //       method: "GET",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     });
+    //     if (response.status === 200) {
+    //       const data = await response.json();
+    //       console.log(data);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error:", error);
+    //   }
+    // };
+    // getTasks();
+  }, [session]);
 
   const handleTypePicker = (value: String) => {
     setTaskType(value);
@@ -25,6 +74,27 @@ const HomePage = () => {
     setDate(formattedDate);
   };
 
+  const handleAddTask = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("/api/addTask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title, description, taskType, date, user_id }),
+      });
+
+      if (response.status === 201) {
+        const data = await response.json();
+        mutate(`/api/getTasks?id=${user_id}`);
+        alert("New Task Added In Database");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <div className="w-screen h-screen bg-red-100 flex flex-col md:flex-row">
       {/* Modal Component */}
@@ -34,7 +104,7 @@ const HomePage = () => {
           <div className="py-10 px-8 border-2 border-gray-300 rounded-xl">
             <h1 className="text-2xl mb-2 font-semibold">Add a new Task</h1>
 
-            <form className="flex flex-col">
+            <form className="flex flex-col" onSubmit={handleAddTask}>
               <label className="text-sm font-semibold py-1">Title</label>
               <input
                 type="text"
@@ -91,9 +161,12 @@ const HomePage = () => {
       )}
       {/* Home Screen */}
       <div className=" w-full min-h-screen md:w-[60%] md:h-full bg-red-200">
-        <h1 className="text-2xl font-semibold px-3 py-3">
-          {session?.user?.name}
-        </h1>
+        <div className="flex justify-between items-center px-7">
+          <h1 className="text-2xl font-semibold px-3 py-3">
+            {session?.user?.name}
+          </h1>
+          <button onClick={() => signOut()}>Sign Out</button>
+        </div>
         {/* Add A Task Button */}
         <button
           className="w-full h-8 bg-white border-t-[1px] border-b-[1px] border-gray-300 px-8 flex flex-row items-center"
@@ -107,9 +180,30 @@ const HomePage = () => {
           />
           <p className="text-gray-400 px-1">Add a new Task</p>
         </button>
+        {data &&
+          data.data.tasks.map((item: any) => (
+            <Link
+              href={`/home?userId=${user_id}&itemId=${item.id}`}
+              className="w-full h-8 bg-white border-b-[1px] border-gray-300 pl-8 flex flex-row items-center justify-between"
+            >
+              <p key={item.id}>{item.title}</p>
+              <div className="flex flex-row">
+                <p className="text-gray-400">{item.date}</p>
+                <Image
+                  src="/images/right.png"
+                  alt="right icon"
+                  width={20}
+                  height={20}
+                  className="ml-2"
+                />
+              </div>
+            </Link>
+          ))}
       </div>
       {/* Detail Component */}
-      <div className="w-full min-h-screen md:w-[40%] md:h-full bg-red-300"></div>
+      <div className="w-full min-h-screen md:w-[40%] md:h-full py-4 px-4 ">
+        <DetailComponent title={itemTitle} />
+      </div>
     </div>
   );
 };

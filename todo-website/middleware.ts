@@ -9,13 +9,13 @@ export async function middleware(request: NextRequest) {
 
   console.log("Token From Middleware : ", token);
 
-  if (token) {
-    return NextResponse.redirect(new URL("/home", request.url));
+  if (!token) {
+    return NextResponse.redirect(new URL("/signIn", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/signIn"],
+  matcher: ["/home"],
 };
