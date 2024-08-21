@@ -6,6 +6,22 @@ export default function Home() {
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
 
+  const resetPassword = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("/api/mailPassword", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const handleSignIn = () => {
     router.push("/signIn");
   };
@@ -17,7 +33,7 @@ export default function Home() {
         <div className="py-6 px-4 border-2 border-gray-300 rounded-xl my-2">
           <h1 className="text-2xl mb-2 font-semibold">Forget Password</h1>
 
-          <form className="flex flex-col">
+          <form className="flex flex-col" onSubmit={resetPassword}>
             <label className="text-sm font-semibold py-1">Email</label>
             <input
               type="email"
