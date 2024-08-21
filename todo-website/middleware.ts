@@ -1,21 +1,50 @@
+// import { NextResponse } from "next/server";
+// import type { NextRequest } from "next/server";
+// import { getToken } from "next-auth/jwt";
+
+// const secret = process.env.NEXT_AUTH_SECRET;
+
+// export async function middleware(request: NextRequest) {
+//   const token = await getToken({ req: request as any });
+
+//   console.log("Token From Middleware : ", token);
+
+//   if (!token) {
+//     return NextResponse.redirect(new URL("/signIn", request.url));
+//   }
+
+//   return NextResponse.next();
+// }
+
+// export const config = {
+//   matcher: ["/home"],
+// };
+
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const secret = process.env.NEXT_AUTH_SECRET;
-
 export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request as any });
 
-  console.log("Token From Middleware : ", token);
+  const signInUrl = new URL("/signIn", request.url);
+  const homeUrl = new URL("/home", request.url);
+
+  const { pathname } = request.nextUrl;
 
   if (!token) {
-    return NextResponse.redirect(new URL("/signIn", request.url));
+    if (pathname !== "/signIn" && pathname !== "/") {
+      return NextResponse.redirect(signInUrl);
+    }
+  } else {
+    if (pathname === "/signIn" || pathname === "/") {
+      return NextResponse.redirect(homeUrl);
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/home"],
+  matcher: ["/home", "/signIn", "/"],
 };
