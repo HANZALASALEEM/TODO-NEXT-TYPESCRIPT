@@ -38,6 +38,10 @@ export default function Home() {
     });
   };
 
+  const handleForgetPassword = () => {
+    router.push("/forgetPassword");
+  };
+
   return (
     <div className="w-screen h-screen flex items-center justify-center">
       <div className="w-3/4 h-3/4 lg:w-1/3">
@@ -64,6 +68,7 @@ export default function Home() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+
             <button
               className="bg-yellow-500 my-2 text-sm py-1 rounded-sm"
               type="submit"
@@ -71,6 +76,12 @@ export default function Home() {
               Continue
             </button>
           </form>
+          <button
+            className="w-full flex justify-end"
+            onClick={handleForgetPassword}
+          >
+            <p className="text-sm underline text-blue-700">forget password</p>
+          </button>
         </div>
         {/* line Saperator */}
         <div className="w-full my-3 flex flex-row items-center justify-between">
