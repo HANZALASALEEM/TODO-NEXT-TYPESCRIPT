@@ -15,8 +15,10 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("Message sent");
-    return NextResponse.json({ msg: "Password reset email sent" });
+    return NextResponse.json(
+      { msg: "Password reset in Database" },
+      { status: 200 }
+    );
   } catch (err) {
     console.error("Error sending email:", err);
     return NextResponse.json(
