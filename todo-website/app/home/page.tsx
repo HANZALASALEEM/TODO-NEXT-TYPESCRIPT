@@ -9,7 +9,6 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import useSWR, { mutate } from "swr";
 import Link from "next/link";
 import DetailComponent from "@/components/DetailComponent";
-import { useSearchParams } from "next/navigation";
 
 const fetcher = (url: string) =>
   fetch(url).then((res) => {
@@ -21,16 +20,14 @@ const fetcher = (url: string) =>
 
 const HomePage = () => {
   const { data: session } = useSession();
-  const searchParams = useSearchParams();
-  const itemTitle = searchParams.get("title");
   const [showModal, setShowModal] = useState<Boolean>(false);
   const [title, setTitle] = useState<String>("");
   const [description, setDescription] = useState<String>("");
   const [taskType, setTaskType] = useState<String>("");
   const [date, setDate] = useState<any>("");
-  const [user_id, setUserId] = useState(session?.user?.id);
+  const [userId, setUserId] = useState(session?.user?.id);
   const { data, error, isLoading } = useSWR(
-    user_id ? `/api/getTasks?id=${user_id}` : null, // Fetch only if user_id is available
+    userId ? `/api/getTasks?id=${userId}` : null,
     fetcher
   );
 
@@ -43,10 +40,10 @@ const HomePage = () => {
   useEffect(() => {
     setUserId(session?.user?.id);
     console.log(data);
-    console.log(user_id);
+    console.log(userId);
     // const getTasks = async () => {
     //   try {
-    //     const response = await fetch(`/api/getTasks?id=${user_id}`, {
+    //     const response = await fetch(`/api/getTasks?id=${userId}`, {
     //       method: "GET",
     //       headers: {
     //         "Content-Type": "application/json",
@@ -82,12 +79,12 @@ const HomePage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title, description, taskType, date, user_id }),
+        body: JSON.stringify({ title, description, taskType, date, userId }),
       });
 
       if (response.status === 201) {
         const data = await response.json();
-        mutate(`/api/getTasks?id=${user_id}`);
+        mutate(`/api/getTasks?id=${userId}`);
         alert("New Task Added In Database");
       }
     } catch (error) {
@@ -96,7 +93,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="w-screen h-screen bg-red-100 flex flex-col md:flex-row">
+    <div className="w-screen min-h-screen flex flex-col md:flex-row">
       {/* Modal Component */}
       {showModal && (
         <Modal onClose={() => setShowModal(false)} isOpen={showModal}>
@@ -160,7 +157,7 @@ const HomePage = () => {
         </Modal>
       )}
       {/* Home Screen */}
-      <div className=" w-full min-h-screen md:w-[60%] md:h-full bg-red-200">
+      <div className=" w-full min-h-screen md:w-[60%] md:h-full">
         <div className="flex justify-between items-center px-7">
           <h1 className="text-2xl font-semibold px-3 py-3">
             {session?.user?.name}
@@ -183,7 +180,7 @@ const HomePage = () => {
         {data &&
           data.data.tasks.map((item: any) => (
             <Link
-              href={`/home?userId=${user_id}&itemId=${item.id}`}
+              href={`/home?userId=${userId}&itemId=${item.id}`}
               className="w-full h-8 bg-white border-b-[1px] border-gray-300 pl-8 flex flex-row items-center justify-between"
             >
               <p key={item.id}>{item.title}</p>
@@ -201,8 +198,8 @@ const HomePage = () => {
           ))}
       </div>
       {/* Detail Component */}
-      <div className="w-full min-h-screen md:w-[40%] md:h-full py-4 px-4 ">
-        <DetailComponent title={itemTitle} />
+      <div className="w-full max-h-screen md:w-[40%] md:h-full py-4 px-4 ">
+        <DetailComponent />
       </div>
     </div>
   );
