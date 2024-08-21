@@ -43,6 +43,7 @@ model User {
   email    String    @unique
   name     String?
   password String?
+  token String? @unique
   todolist TodoList?
 }
 
