@@ -43,10 +43,8 @@ export async function POST(req: Request) {
         },
       });
 
-      console.log("Message sent");
       return NextResponse.json({ msg: "Password reset email sent" });
     } else {
-      console.log("User not found");
       return NextResponse.json({ msg: "User not found" }, { status: 404 });
     }
   } catch (err) {

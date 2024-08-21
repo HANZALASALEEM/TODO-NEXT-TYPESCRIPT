@@ -135,7 +135,6 @@ export const authOption: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user, account, profile, isNewUser }) {
-      console.log(token);
       return token;
     },
   },

@@ -20,10 +20,10 @@ const fetcher = (url: string) =>
 
 const HomePage = () => {
   const { data: session } = useSession();
-  const [showModal, setShowModal] = useState<Boolean>(false);
-  const [title, setTitle] = useState<String>("");
-  const [description, setDescription] = useState<String>("");
-  const [taskType, setTaskType] = useState<String>("");
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [taskType, setTaskType] = useState<string>("");
   const [date, setDate] = useState<any>("");
   const [userId, setUserId] = useState(session?.user?.id);
   const { data, error, isLoading } = useSWR(
@@ -39,8 +39,6 @@ const HomePage = () => {
 
   useEffect(() => {
     setUserId(session?.user?.id);
-    console.log(data);
-    console.log(userId);
     // const getTasks = async () => {
     //   try {
     //     const response = await fetch(`/api/getTasks?id=${userId}`, {
@@ -60,7 +58,7 @@ const HomePage = () => {
     // getTasks();
   }, [session]);
 
-  const handleTypePicker = (value: String) => {
+  const handleTypePicker = (value: string) => {
     setTaskType(value);
   };
 
@@ -189,7 +187,7 @@ const HomePage = () => {
                 <Image
                   src="/images/right.png"
                   alt="right icon"
-                  width={20}
+                  width={30}
                   height={20}
                   className="ml-2"
                 />
