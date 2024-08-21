@@ -7,10 +7,10 @@
 //     const body = await req.json();
 
 //     // Destructure required fields from the request body
-//     const { user_id, title, description, taskType, date } = body;
+//     const { userId, title, description, taskType, date } = body;
 
 //     // Validate required fields
-//     if (!user_id || !title) {
+//     if (!userId || !title) {
 //       return NextResponse.json(
 //         { error: "User ID and title are required" },
 //         { status: 400 }
@@ -19,7 +19,7 @@
 
 //     // Check if the user exists
 //     const user = await prisma.users.findUnique({
-//       where: { id: Number(user_id) },
+//       where: { id: Number(userId) },
 //       include: { todolist: true },
 //     });
 
@@ -69,11 +69,11 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { user_id, title, description, taskType, date } = body;
+  const { userId, title, description, taskType, date } = body;
 
   try {
     // Validate input
-    if (!user_id || !title) {
+    if (!userId || !title) {
       return NextResponse.json(
         { msg: "Missing required fields" },
         { status: 400 }
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
 
     // Check if user exists
     const user = await prisma.user.findUnique({
-      where: { id: Number(user_id) },
+      where: { id: Number(userId) },
     });
 
     if (!user) {
@@ -91,14 +91,14 @@ export async function POST(req: Request) {
 
     // Check if TodoList exists; create if not
     let todolist = await prisma.todoList.findUnique({
-      where: { id: Number(user_id) },
+      where: { id: Number(userId) },
     });
 
     if (!todolist) {
       todolist = await prisma.todoList.create({
         data: {
           user: {
-            connect: { id: Number(user_id) },
+            connect: { id: Number(userId) },
           },
         },
       });
@@ -112,7 +112,7 @@ export async function POST(req: Request) {
         taskType,
         date,
         todolist: {
-          connect: { id: Number(user_id) },
+          connect: { id: Number(userId) },
         },
       },
     });
