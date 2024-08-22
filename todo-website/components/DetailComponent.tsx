@@ -30,9 +30,7 @@ const DetailComponent = () => {
   }, [searchParams]);
 
   const { data, error, isLoading } = useSWR(
-    userId && itemId
-      ? `/api/getUniqueTask?userId=${userId}&itemId=${itemId}`
-      : null,
+    userId && itemId ? `/api/tasks?userId=${userId}&itemId=${itemId}` : null,
     fetcher
   );
 
@@ -59,8 +57,8 @@ const DetailComponent = () => {
   const handleUpdateTask = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/updateTask", {
-        method: "POST",
+      const response = await fetch("/api/tasks", {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -76,7 +74,7 @@ const DetailComponent = () => {
 
       if (response.status === 200) {
         const data = await response.json();
-        mutate(`/api/getTasks?id=${userId}`);
+        mutate(`/api/tasks?id=${userId}`);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -86,7 +84,7 @@ const DetailComponent = () => {
   const handleDeleteTask = async () => {
     try {
       const response = await fetch(
-        `/api/deleteTask?userId=${userId}&itemId=${itemId}`,
+        `/api/tasks?userId=${userId}&itemId=${itemId}`,
         {
           method: "DELETE",
           headers: {
@@ -96,7 +94,7 @@ const DetailComponent = () => {
       );
 
       if (response.status === 200) {
-        mutate(`/api/getTasks?id=${userId}`);
+        mutate(`/api/tasks?id=${userId}`);
         router.replace("/home");
       }
     } catch (error) {

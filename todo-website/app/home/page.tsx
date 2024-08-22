@@ -27,7 +27,7 @@ const HomePage = () => {
   const [date, setDate] = useState<any>("");
   const [userId, setUserId] = useState(session?.user?.id);
   const { data, error, isLoading } = useSWR(
-    userId ? `/api/getTasks?id=${userId}` : null,
+    userId ? `/api/tasks?id=${userId}` : null,
     fetcher
   );
 
@@ -72,7 +72,7 @@ const HomePage = () => {
   const handleAddTask = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/addTask", {
+      const response = await fetch("/api/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +82,7 @@ const HomePage = () => {
 
       if (response.status === 201) {
         const data = await response.json();
-        mutate(`/api/getTasks?id=${userId}`);
+        mutate(`/api/tasks?id=${userId}`);
         alert("New Task Added In Database");
       }
     } catch (error) {

@@ -132,9 +132,19 @@ export const authOption: NextAuthOptions = {
   callbacks: {
     async session({ session, user, token }) {
       session.user.id = token.sub;
+      console.log("user from session", user);
+      console.log("session from session", session);
+
       return session;
     },
-    async jwt({ token, user, account, profile, isNewUser }) {
+    async jwt({ token, user }) {
+      if (user) {
+        token = {
+          sub: user.id,
+          name: "dummy",
+        };
+      }
+      console.log("token from JWT", token);
       return token;
     },
   },
