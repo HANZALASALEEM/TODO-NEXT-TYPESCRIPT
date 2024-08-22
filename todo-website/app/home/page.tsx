@@ -25,8 +25,13 @@ const HomePage = () => {
   const [taskType, setTaskType] = useState<string>("");
   const [date, setDate] = useState<any>("");
   const { data, error, isLoading } = useSWR(`/api/tasks`, fetcher);
-  //   const { data: user } = useSWR(`/api/users`, fetcher);
-
+  console.log(data);
+  const {
+    data: user,
+    error: userError,
+    isLoading: userLoading,
+  } = useSWR(`/api/users`, fetcher);
+  console.log(user);
   const handleTypePicker = (value: string) => {
     setTaskType(value);
   };
@@ -126,9 +131,17 @@ const HomePage = () => {
       {/* Home Screen */}
       <div className=" w-full min-h-screen md:w-[60%] md:h-full">
         <div className="flex justify-between items-center px-7">
-          <h1 className="text-2xl font-semibold px-3 py-3">
-            {/* {user.data.name} */}
-          </h1>
+          {userLoading ? (
+            <p>Loading...</p>
+          ) : userError ? (
+            <p>Error loading user data</p>
+          ) : user ? (
+            <h1 className="text-2xl font-semibold px-3 py-3">
+              {user.data.name}
+            </h1>
+          ) : (
+            <p>No user data available</p>
+          )}
           <button onClick={() => signOut()}>Sign Out</button>
         </div>
         {/* Add A Task Button */}

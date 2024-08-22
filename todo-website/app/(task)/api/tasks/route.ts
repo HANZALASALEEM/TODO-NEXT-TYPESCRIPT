@@ -4,6 +4,7 @@ import { getToken } from "next-auth/jwt";
 
 async function getUserId(req: Request) {
   const token = await getToken({ req: req as any });
+  console.log("Token From Tasks", token);
   return token?.sub;
 }
 

@@ -8,15 +8,12 @@ async function getUserId(req: Request) {
   const token = await getToken({
     req: req as any,
   });
-  console.log(token);
+  console.log("Token from User", token);
   return token?.sub;
 }
 
 export async function GET(req: Request) {
   const userId = await getUserId(req);
-  //   const url = new URL(req.url);
-  //   const searchParams = new URLSearchParams(url.searchParams);
-  //   const userId = searchParams.get("id");
   console.log("User ID : ", userId);
 
   if (!userId) {
