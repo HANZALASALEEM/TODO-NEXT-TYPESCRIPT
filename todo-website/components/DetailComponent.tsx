@@ -55,7 +55,7 @@ const DetailComponent = () => {
   const handleUpdateTask = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/tasks", {
+      const response = await fetch(`/api/tasks/${itemId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -65,7 +65,6 @@ const DetailComponent = () => {
           description,
           taskType,
           date,
-          itemId,
         }),
       });
 
@@ -80,7 +79,7 @@ const DetailComponent = () => {
 
   const handleDeleteTask = async () => {
     try {
-      const response = await fetch(`/api/tasks?itemId=${itemId}`, {
+      const response = await fetch(`/api/tasks/${itemId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
