@@ -1,6 +1,6 @@
 "use client";
 import React, { FormEvent, useEffect, useState } from "react";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Modal from "@/components/Modal/Modal";
 import { Select, Space, DatePicker } from "antd";
@@ -19,7 +19,6 @@ const fetcher = (url: string) =>
   });
 
 const HomePage = () => {
-  const { data: session } = useSession();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -27,32 +26,6 @@ const HomePage = () => {
   const [date, setDate] = useState<any>("");
   const { data, error, isLoading } = useSWR(`/api/tasks`, fetcher);
   //   const { data: user } = useSWR(`/api/users`, fetcher);
-
-  //   // Error handling
-  //   if (error) return <div>Error loading tasks</div>;
-
-  //   // Loading state
-  //   if (isLoading) return <div>Loading...</div>;
-
-  useEffect(() => {
-    // const getTasks = async () => {
-    //   try {
-    //     const response = await fetch(`/api/getTasks?id=${userId}`, {
-    //       method: "GET",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //     });
-    //     if (response.status === 200) {
-    //       const data = await response.json();
-    //       console.log(data);
-    //     }
-    //   } catch (error) {
-    //     console.error("Error:", error);
-    //   }
-    // };
-    // getTasks();
-  }, [session]);
 
   const handleTypePicker = (value: string) => {
     setTaskType(value);
@@ -154,7 +127,6 @@ const HomePage = () => {
       <div className=" w-full min-h-screen md:w-[60%] md:h-full">
         <div className="flex justify-between items-center px-7">
           <h1 className="text-2xl font-semibold px-3 py-3">
-            {/* {session?.user?.id} */}
             {/* {user.data.name} */}
           </h1>
           <button onClick={() => signOut()}>Sign Out</button>
