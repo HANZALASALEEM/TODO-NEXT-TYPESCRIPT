@@ -26,6 +26,7 @@ const HomePage = () => {
   const [taskType, setTaskType] = useState<string>("");
   const [date, setDate] = useState<any>("");
   const { data, error, isLoading } = useSWR(`/api/tasks`, fetcher);
+  //   const { data: user } = useSWR(`/api/users`, fetcher);
 
   //   // Error handling
   //   if (error) return <div>Error loading tasks</div>;
@@ -153,7 +154,8 @@ const HomePage = () => {
       <div className=" w-full min-h-screen md:w-[60%] md:h-full">
         <div className="flex justify-between items-center px-7">
           <h1 className="text-2xl font-semibold px-3 py-3">
-            {session?.user?.name}
+            {/* {session?.user?.id} */}
+            {/* {user.data.name} */}
           </h1>
           <button onClick={() => signOut()}>Sign Out</button>
         </div>

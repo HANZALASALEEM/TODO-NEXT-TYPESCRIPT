@@ -8,29 +8,73 @@ export default function Home() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<string>("");
+  const [otp, setOtp] = useState<string>("");
+  const [typeOtp, setTypeOtp] = useState<string>("");
+  const [verifiedUser, setVerifiedUser] = useState<boolean>(false);
+  const [verifiedEmail, setVerifiedEmail] = useState<string>("");
 
   const signUpUser = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("/api/signup", {
+      if (verifiedUser && verifiedEmail == email) {
+        const response = await fetch("/api/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password, name }),
+        });
+
+        if (response.status === 409) {
+          alert("User already exists");
+        } else if (response.status === 201) {
+          const data = await response.json();
+          router.push("/signIn");
+        } else {
+          console.error("Signup failed");
+        }
+      } else {
+        alert("Verify email first");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const handleSendOTP = async () => {
+    try {
+      const response = await fetch("/api/sendOTP", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ email }),
       });
 
-      if (response.status === 409) {
-        alert("User already exists");
-      } else if (response.status === 201) {
+      if (response.status === 200) {
         const data = await response.json();
-        router.push("/signIn");
-      } else {
-        console.error("Signup failed");
+        setOtp(data.otp);
+        setVerifiedEmail(data.verifiedEmail);
+        alert("Email send Successfully");
+        console.log(data.verifiedEmail);
       }
     } catch (error) {
       console.error("Error:", error);
+    }
+  };
+
+  const handleVerifyOTP = () => {
+    if (otp) {
+      if (otp == typeOtp) {
+        alert("Please enter password and SignUp");
+        setOtp("");
+        setVerifiedUser(true);
+      } else {
+        alert("Your given OTP is wrong");
+      }
+    } else {
+      alert("Get OTP first");
     }
   };
 
@@ -70,14 +114,41 @@ export default function Home() {
               onChange={(e) => setName(e.target.value)}
             />
             <label className="text-sm font-semibold py-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              className="rounded-sm border-2"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <div className="flex flex-row bg-red-100">
+              <input
+                type="email"
+                name="email"
+                className="rounded-sm border-2 w-5/6"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <button
+                className="bg-yellow-500 w-1/6 text-sm rounded-sm"
+                type="button"
+                onClick={handleSendOTP}
+              >
+                OTP
+              </button>
+            </div>
+            <label className="text-sm font-semibold py-1">Type OTP</label>
+            <div className="flex flex-row bg-red-100">
+              <input
+                type="numeric"
+                name="otp"
+                className="rounded-sm border-2 w-5/6"
+                required
+                value={typeOtp}
+                onChange={(e) => setTypeOtp(e.target.value)}
+              />
+              <button
+                className="bg-yellow-500 w-1/6 text-sm rounded-sm"
+                type="button"
+                onClick={handleVerifyOTP}
+              >
+                Verify
+              </button>
+            </div>
             <label className="text-sm font-semibold py-1">Password</label>
             <input
               type="password"
