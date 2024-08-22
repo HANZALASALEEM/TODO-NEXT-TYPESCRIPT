@@ -25,11 +25,7 @@ const HomePage = () => {
   const [description, setDescription] = useState<string>("");
   const [taskType, setTaskType] = useState<string>("");
   const [date, setDate] = useState<any>("");
-  const [userId, setUserId] = useState(session?.user?.id);
-  const { data, error, isLoading } = useSWR(
-    userId ? `/api/tasks?id=${userId}` : null,
-    fetcher
-  );
+  const { data, error, isLoading } = useSWR(`/api/tasks`, fetcher);
 
   //   // Error handling
   //   if (error) return <div>Error loading tasks</div>;
@@ -38,7 +34,6 @@ const HomePage = () => {
   //   if (isLoading) return <div>Loading...</div>;
 
   useEffect(() => {
-    setUserId(session?.user?.id);
     // const getTasks = async () => {
     //   try {
     //     const response = await fetch(`/api/getTasks?id=${userId}`, {
@@ -77,12 +72,12 @@ const HomePage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title, description, taskType, date, userId }),
+        body: JSON.stringify({ title, description, taskType, date }),
       });
 
       if (response.status === 201) {
         const data = await response.json();
-        mutate(`/api/tasks?id=${userId}`);
+        mutate(`/api/tasks`);
         alert("New Task Added In Database");
       }
     } catch (error) {
@@ -178,7 +173,7 @@ const HomePage = () => {
         {data &&
           data.data.tasks.map((item: any) => (
             <Link
-              href={`/home?userId=${userId}&itemId=${item.id}`}
+              href={`/home?itemId=${item.id}`}
               className="w-full h-8 bg-white border-b-[1px] border-gray-300 pl-8 flex flex-row items-center justify-between"
             >
               <p key={item.id}>{item.title}</p>

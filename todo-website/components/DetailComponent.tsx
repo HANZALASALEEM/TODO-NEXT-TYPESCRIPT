@@ -17,7 +17,6 @@ const fetcher = (url: string) =>
 const DetailComponent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [userId, setUserId] = useState<string | null>(null);
   const [itemId, setItemId] = useState<string | null>(null);
   const [title, setTitle] = useState<string | undefined>("");
   const [description, setDescription] = useState<string>("");
@@ -25,12 +24,11 @@ const DetailComponent = () => {
   const [date, setDate] = useState<any>("");
 
   useEffect(() => {
-    setUserId(searchParams.get("userId"));
     setItemId(searchParams.get("itemId"));
   }, [searchParams]);
 
   const { data, error, isLoading } = useSWR(
-    userId && itemId ? `/api/tasks?userId=${userId}&itemId=${itemId}` : null,
+    itemId ? `/api/tasks?itemId=${itemId}` : null,
     fetcher
   );
 
@@ -67,14 +65,13 @@ const DetailComponent = () => {
           description,
           taskType,
           date,
-          userId,
           itemId,
         }),
       });
 
       if (response.status === 200) {
         const data = await response.json();
-        mutate(`/api/tasks?id=${userId}`);
+        mutate(`/api/tasks`);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -83,18 +80,15 @@ const DetailComponent = () => {
 
   const handleDeleteTask = async () => {
     try {
-      const response = await fetch(
-        `/api/tasks?userId=${userId}&itemId=${itemId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`/api/tasks?itemId=${itemId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.status === 200) {
-        mutate(`/api/tasks?id=${userId}`);
+        mutate(`/api/tasks`);
         router.replace("/home");
       }
     } catch (error) {
