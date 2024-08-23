@@ -9,7 +9,6 @@ export default function Home() {
   const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [typeOtp, setTypeOtp] = useState<string>("");
-  const [verifiedUser, setVerifiedUser] = useState<string>("");
   const [verifiedEmail, setVerifiedEmail] = useState<string>("");
 
   const signUpUser = async (e: FormEvent<HTMLFormElement>) => {
@@ -28,7 +27,6 @@ export default function Home() {
         if (response.status === 409) {
           alert("User already exists");
         } else if (response.status === 201) {
-          const data = await response.json();
           router.push("/signIn");
         } else if (response.status === 403) {
           alert("Get OTP First");

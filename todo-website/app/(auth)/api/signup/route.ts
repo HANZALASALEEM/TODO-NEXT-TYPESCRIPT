@@ -35,7 +35,7 @@ export async function POST(req: Request, res: Response) {
             name,
             email,
             password,
-          },
+          }, //?: No need to add a new feild verified with bolean because of verification in signUp route
         });
         return NextResponse.json(
           { msg: "New User Created", data: newUser },
