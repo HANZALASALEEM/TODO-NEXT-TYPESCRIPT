@@ -1,8 +1,6 @@
-import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { nanoid } from "nanoid";
+
 import nodemailer from "nodemailer";
-import { randomstring } from "randomstring";
 
 export async function POST(req: Request) {
   const body = await req.json();
