@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 import nodemailer from "nodemailer";
@@ -24,8 +25,24 @@ export async function POST(req: Request) {
       text: `Please paste this OTP on the Sign Up screen`,
       html: htmlBody,
     });
+
+    const existingOtp = await prisma.otp.findUnique({
+      where: { email: email },
+    });
+
+    if (existingOtp) {
+      await prisma.otp.update({
+        where: { email: email },
+        data: { otp: Number(otp) },
+      });
+    } else {
+      await prisma.otp.create({
+        data: { otp: Number(otp), email: email },
+      });
+    }
+
     return NextResponse.json(
-      { msg: "Email send Successfully", otp: otp, verifiedEmail: email },
+      { msg: "Email send Successfully", verifiedEmail: email },
       { status: 200 }
     );
   } catch (error) {

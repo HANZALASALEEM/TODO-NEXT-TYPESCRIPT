@@ -8,7 +8,6 @@ export default function Home() {
   const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<string>("");
-  const [otp, setOtp] = useState<string>("");
   const [typeOtp, setTypeOtp] = useState<string>("");
   const [verifiedUser, setVerifiedUser] = useState<string>("");
   const [verifiedEmail, setVerifiedEmail] = useState<string>("");
@@ -55,7 +54,6 @@ export default function Home() {
 
         if (response.status === 200) {
           const data = await response.json();
-          setOtp(data.otp);
           setVerifiedEmail(data.verifiedEmail);
           alert("Email Send Successfully");
         }
@@ -74,12 +72,11 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ otp, typeOtp }),
+        body: JSON.stringify({ email, typeOtp }),
       });
 
       if (response.status === 200) {
         setVerifiedUser("verified");
-        setOtp("");
         alert("OTP Verified Successfully");
       } else if (response.status === 403) {
         alert("Get OTP First");

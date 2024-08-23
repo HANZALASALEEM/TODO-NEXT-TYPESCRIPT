@@ -25,13 +25,11 @@ const HomePage = () => {
   const [taskType, setTaskType] = useState<string>("");
   const [date, setDate] = useState<any>("");
   const { data, error, isLoading } = useSWR(`/api/tasks`, fetcher);
-  console.log(data);
   const {
     data: user,
     error: userError,
     isLoading: userLoading,
   } = useSWR(`/api/users`, fetcher);
-  console.log(user);
   const handleTypePicker = (value: string) => {
     setTaskType(value);
   };
@@ -55,7 +53,6 @@ const HomePage = () => {
       });
 
       if (response.status === 201) {
-        const data = await response.json();
         mutate(`/api/tasks`);
         alert("New Task Added In Database");
       }

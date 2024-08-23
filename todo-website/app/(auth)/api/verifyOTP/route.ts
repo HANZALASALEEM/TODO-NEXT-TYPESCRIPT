@@ -1,11 +1,17 @@
+import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { otp, typeOtp } = body;
+  const { email, typeOtp } = body;
+
   try {
-    if (otp) {
-      if (otp == typeOtp) {
+    const existingOtp = await prisma.otp.findUnique({
+      where: { email: email },
+    });
+
+    if (existingOtp) {
+      if (existingOtp?.otp === Number(typeOtp)) {
         return NextResponse.json(
           { msg: "Verification Complete... Please SignUp" },
           { status: 200 }
