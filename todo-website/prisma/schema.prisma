@@ -68,5 +68,6 @@ model Otp {
   id          Int       @id @default(autoincrement())
   otp         Int
   email       String    @unique
+  expireAt    DateTime?
 }
 
