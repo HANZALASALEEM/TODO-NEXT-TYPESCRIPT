@@ -6,6 +6,8 @@ import nodemailer from "nodemailer";
 export async function POST(req: Request) {
   const body = await req.json();
   const { email } = body;
+  const expireAt = new Date();
+  expireAt.setSeconds(expireAt.getSeconds() + 3600).toString();
   try {
     const otp = Math.floor(100000 + Math.random() * 900000);
     const transport = nodemailer.createTransport({
@@ -33,16 +35,16 @@ export async function POST(req: Request) {
     if (existingOtp) {
       await prisma.otp.update({
         where: { email: email },
-        data: { otp: Number(otp) },
+        data: { otp: Number(otp), expireAt: expireAt },
       });
     } else {
       await prisma.otp.create({
-        data: { otp: Number(otp), email: email },
+        data: { otp: Number(otp), email: email, expireAt: expireAt },
       });
     }
 
     return NextResponse.json(
-      { msg: "Email send Successfully", verifiedEmail: email },
+      { msg: "Email send Successfully" },
       { status: 200 }
     );
   } catch (error) {

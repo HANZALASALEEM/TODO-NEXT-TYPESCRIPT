@@ -9,34 +9,31 @@ export default function Home() {
   const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [typeOtp, setTypeOtp] = useState<string>("");
-  const [verifiedEmail, setVerifiedEmail] = useState<string>("");
 
   const signUpUser = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      if (verifiedEmail == email) {
-        const response = await fetch("/api/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password, name, typeOtp }),
-        });
+      const response = await fetch("/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password, name, typeOtp }),
+      });
 
-        if (response.status === 409) {
-          alert("User already exists");
-        } else if (response.status === 201) {
-          router.push("/signIn");
-        } else if (response.status === 403) {
-          alert("Get OTP First");
-        } else if (response.status === 400) {
-          alert("Your Given OTP is Wrong");
-        } else {
-          console.error("Signup failed");
-        }
+      if (response.status === 409) {
+        alert("User already exists");
+      } else if (response.status === 201) {
+        router.push("/signIn");
+      } else if (response.status === 403) {
+        alert("Get OTP First");
+      } else if (response.status === 400) {
+        alert("Your Given OTP is Wrong");
+      } else if (response.status === 404) {
+        alert("Your OTP Expired Get a New One");
       } else {
-        alert("Verify email first");
+        console.error("Signup failed");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -55,8 +52,6 @@ export default function Home() {
         });
 
         if (response.status === 200) {
-          const data = await response.json();
-          setVerifiedEmail(data.verifiedEmail);
           alert("Email Send Successfully");
         }
       } catch (error) {

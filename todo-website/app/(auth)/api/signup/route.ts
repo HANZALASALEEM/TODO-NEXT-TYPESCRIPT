@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request, res: Response) {
   const body = await req.json();
   const { email, password, name, typeOtp } = body;
+  const currentTime = new Date();
+  //TODO: currentTime.setSeconds(currentTime.getSeconds() + 3600).toString();
   if (!email || !password || !name) {
     return NextResponse.json(
       { msg: "All fields are required" },
@@ -14,37 +16,43 @@ export async function POST(req: Request, res: Response) {
     const existingOtp = await prisma.otp.findUnique({
       where: { email: email },
     });
-
     if (existingOtp) {
-      if (existingOtp?.otp === Number(typeOtp)) {
-        const findUser = await prisma.user.findUnique({
-          where: {
-            email: email,
-          },
-        });
+      if (existingOtp?.expireAt! > currentTime) {
+        if (existingOtp?.otp === Number(typeOtp)) {
+          const findUser = await prisma.user.findUnique({
+            where: {
+              email: email,
+            },
+          });
 
-        if (findUser) {
+          if (findUser) {
+            return NextResponse.json(
+              { msg: "User Already Exists" },
+              { status: 409 }
+            );
+          }
+
+          const newUser = await prisma.user.create({
+            data: {
+              name,
+              email,
+              password,
+            }, //?: No need to add a new feild verified with bolean because of verification in signUp route
+          });
           return NextResponse.json(
-            { msg: "User Already Exists" },
-            { status: 409 }
+            { msg: "New User Created", data: newUser },
+            { status: 201 }
+          );
+        } else {
+          return NextResponse.json(
+            { msg: "Your Given OTP is Wrong" },
+            { status: 400 }
           );
         }
-
-        const newUser = await prisma.user.create({
-          data: {
-            name,
-            email,
-            password,
-          }, //?: No need to add a new feild verified with bolean because of verification in signUp route
-        });
-        return NextResponse.json(
-          { msg: "New User Created", data: newUser },
-          { status: 201 }
-        );
       } else {
         return NextResponse.json(
-          { msg: "Your Given OTP is Wrong" },
-          { status: 400 }
+          { msg: "Your OTP is Expired Get a new One" },
+          { status: 404 }
         );
       }
     } else {
