@@ -39,28 +39,34 @@ datasource db {
 // }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique
-  name     String?
-  password String?
-  token String? @unique
-  todolist TodoList?
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  name        String?
+  password    String?
+  token       String?   @unique
+  todolist    TodoList?
 }
 
 model TodoList {
-  id    Int    @id @default(autoincrement())
-  user  User   @relation(fields: [userId], references: [id])
-  userId Int   @unique
-  tasks Task[]
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int       @unique
+  tasks       Task[]
 }
 
 model Task {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   description String?
   taskType    String?
   date        String?
   todolistId  Int
-  todolist    TodoList @relation(fields: [todolistId], references: [id])
+  todolist    TodoList  @relation(fields: [todolistId], references: [id])
+}
+
+model Otp {
+  id          Int       @id @default(autoincrement())
+  otp         Int
+  email       String    @unique
 }
 
