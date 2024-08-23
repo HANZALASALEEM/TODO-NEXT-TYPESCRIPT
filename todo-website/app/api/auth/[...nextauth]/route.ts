@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { prisma } from "@/lib/db";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcrypt";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
@@ -108,23 +109,66 @@ export const authOption: NextAuthOptions = {
         email: { label: "Email", type: "text", placeholder: "jsmith" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
+      // async authorize(credentials, req) {
+      //   if (!credentials?.email || !credentials?.password) {
+      //     return null;
+      //   }
+      //   const validUser = await prisma.user.findUnique({
+      //     where: { email: credentials?.email },
+      //   });
+
+      //   const passwordMatches = await bcrypt.compare(
+      //     credentials?.password,
+      //     validUser!.password
+      //   );
+
+      //   if (passwordMatches) {
+      //     const existingUser = await prisma.user.findUnique({
+      //       where: {
+      //         email: credentials?.email,
+      //         password: credentials?.password,
+      //       },
+      //     });
+
+      //     if (!existingUser) {
+      //       return null;
+      //     }
+      //     if (existingUser) {
+      //       return {
+      //         id: `${existingUser.id}`,
+      //         email: existingUser.email,
+      //         name: existingUser.name,
+      //       };
+      //     }
+      //   }
+
+      //   return null;
+      // },
+      async authorize(credentials) {
+        // Check if credentials are provided
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        const existingUser = await prisma.user.findUnique({
-          where: { email: credentials?.email, password: credentials?.password },
+
+        // Find the user by email
+        const validUser = await prisma.user.findUnique({
+          where: { email: credentials.email },
         });
-        if (!existingUser) {
-          return null;
-        }
-        if (existingUser) {
+
+        // Check if the user exists and if the passwords match
+        if (
+          validUser &&
+          (await bcrypt.compare(credentials.password, validUser.password))
+        ) {
+          // Return user object with required fields
           return {
-            id: `${existingUser.id}`,
-            email: existingUser.email,
-            name: existingUser.name,
+            id: `${validUser.id}`,
+            email: validUser.email,
+            name: validUser.name,
           };
         }
+
+        // Return null if authentication fails
         return null;
       },
     }),

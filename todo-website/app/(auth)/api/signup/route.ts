@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import bcrypt from "bcrypt";
 
 export async function POST(req: Request, res: Response) {
   const body = await req.json();
   const { email, password, name, typeOtp } = body;
   const currentTime = new Date();
   //TODO: currentTime.setSeconds(currentTime.getSeconds() + 3600).toString();
+
   if (!email || !password || !name) {
     return NextResponse.json(
       { msg: "All fields are required" },
@@ -31,12 +33,12 @@ export async function POST(req: Request, res: Response) {
               { status: 409 }
             );
           }
-
+          const hashedPassword = await bcrypt.hash(password, 10);
           const newUser = await prisma.user.create({
             data: {
               name,
               email,
-              password,
+              password: hashedPassword,
             }, //?: No need to add a new feild verified with bolean because of verification in signUp route
           });
           return NextResponse.json(
