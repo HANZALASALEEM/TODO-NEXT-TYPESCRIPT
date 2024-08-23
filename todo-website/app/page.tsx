@@ -5,19 +5,19 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 export default function Home() {
   const router = useRouter();
-  const [email, setEmail] = useState<string>("");
+  const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [otp, setOtp] = useState<string>("");
   const [typeOtp, setTypeOtp] = useState<string>("");
-  const [verifiedUser, setVerifiedUser] = useState<boolean>(false);
+  const [verifiedUser, setVerifiedUser] = useState<string>("");
   const [verifiedEmail, setVerifiedEmail] = useState<string>("");
 
   const signUpUser = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      if (verifiedUser && verifiedEmail == email) {
+      if (verifiedUser === "verified" && verifiedEmail == email) {
         const response = await fetch("/api/signup", {
           method: "POST",
           headers: {
@@ -43,38 +43,51 @@ export default function Home() {
   };
 
   const handleSendOTP = async () => {
+    if (email) {
+      try {
+        const response = await fetch("/api/sendOTP", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        if (response.status === 200) {
+          const data = await response.json();
+          setOtp(data.otp);
+          setVerifiedEmail(data.verifiedEmail);
+          alert("Email Send Successfully");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    } else if (!email) {
+      alert("Enter Your Email");
+    }
+  };
+
+  const handleVerifyOTP = async () => {
     try {
-      const response = await fetch("/api/sendOTP", {
+      const response = await fetch("/api/verifyOTP", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ otp, typeOtp }),
       });
 
       if (response.status === 200) {
-        const data = await response.json();
-        setOtp(data.otp);
-        setVerifiedEmail(data.verifiedEmail);
-        alert("Email send Successfully");
-        console.log(data.verifiedEmail);
+        setVerifiedUser("verified");
+        setOtp("");
+        alert("OTP Verified Successfully");
+      } else if (response.status === 403) {
+        alert("Get OTP First");
+      } else if (response.status === 400) {
+        alert("Your Given OTP is Wrong");
       }
     } catch (error) {
       console.error("Error:", error);
-    }
-  };
-
-  const handleVerifyOTP = () => {
-    if (otp) {
-      if (otp == typeOtp) {
-        alert("Please enter password and SignUp");
-        setOtp("");
-        setVerifiedUser(true);
-      } else {
-        alert("Your given OTP is wrong");
-      }
-    } else {
-      alert("Get OTP first");
     }
   };
 
@@ -120,7 +133,6 @@ export default function Home() {
                 name="email"
                 className="rounded-sm border-2 w-5/6"
                 required
-                value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
               <button
