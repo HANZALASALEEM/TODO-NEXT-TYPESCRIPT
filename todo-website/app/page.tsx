@@ -16,13 +16,13 @@ export default function Home() {
     e.preventDefault();
 
     try {
-      if (verifiedUser === "verified" && verifiedEmail == email) {
+      if (verifiedEmail == email) {
         const response = await fetch("/api/signup", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, password, name }),
+          body: JSON.stringify({ email, password, name, typeOtp }),
         });
 
         if (response.status === 409) {
@@ -30,6 +30,10 @@ export default function Home() {
         } else if (response.status === 201) {
           const data = await response.json();
           router.push("/signIn");
+        } else if (response.status === 403) {
+          alert("Get OTP First");
+        } else if (response.status === 400) {
+          alert("Your Given OTP is Wrong");
         } else {
           console.error("Signup failed");
         }
@@ -62,29 +66,6 @@ export default function Home() {
       }
     } else if (!email) {
       alert("Enter Your Email");
-    }
-  };
-
-  const handleVerifyOTP = async () => {
-    try {
-      const response = await fetch("/api/verifyOTP", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, typeOtp }),
-      });
-
-      if (response.status === 200) {
-        setVerifiedUser("verified");
-        alert("OTP Verified Successfully");
-      } else if (response.status === 403) {
-        alert("Get OTP First");
-      } else if (response.status === 400) {
-        alert("Your Given OTP is Wrong");
-      }
-    } catch (error) {
-      console.error("Error:", error);
     }
   };
 
@@ -128,36 +109,29 @@ export default function Home() {
               <input
                 type="email"
                 name="email"
-                className="rounded-sm border-2 w-5/6"
+                className="rounded-sm border-2 w-4/6"
                 required
                 onChange={(e) => setEmail(e.target.value)}
               />
               <button
-                className="bg-yellow-500 w-1/6 text-sm rounded-sm"
+                className="bg-yellow-500 w-2/6 text-sm rounded-sm"
                 type="button"
                 onClick={handleSendOTP}
               >
-                OTP
+                Send OTP
               </button>
             </div>
             <label className="text-sm font-semibold py-1">Type OTP</label>
-            <div className="flex flex-row bg-red-100">
-              <input
-                type="numeric"
-                name="otp"
-                className="rounded-sm border-2 w-5/6"
-                required
-                value={typeOtp}
-                onChange={(e) => setTypeOtp(e.target.value)}
-              />
-              <button
-                className="bg-yellow-500 w-1/6 text-sm rounded-sm"
-                type="button"
-                onClick={handleVerifyOTP}
-              >
-                Verify
-              </button>
-            </div>
+
+            <input
+              type="numeric"
+              name="otp"
+              className="rounded-sm border-2"
+              required
+              value={typeOtp}
+              onChange={(e) => setTypeOtp(e.target.value)}
+            />
+
             <label className="text-sm font-semibold py-1">Password</label>
             <input
               type="password"
