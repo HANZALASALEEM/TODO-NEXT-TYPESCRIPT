@@ -48,7 +48,7 @@ model User {
 }
 
 model TodoList {
-  id          Int       @id @default(autoincrement())
+  id          Int       @id @unique
   user        User      @relation(fields: [userId], references: [id])
   userId      Int       @unique
   tasks       Task[]
